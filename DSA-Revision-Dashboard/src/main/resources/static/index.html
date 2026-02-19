@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Revision Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+    <div class="max-w-6xl mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-4xl font-bold text-gray-800 mb-2">DSA Revision Dashboard</h1>
+                    <p class="text-gray-600">Track your coding practice problems and progress</p>
+                </div>
+                <a
+                    href="https://docs.google.com/forms/d/e/1FAIpQLSfW2yveZfAQfhwq3l15OyVdskoAZ6Vwtco3Bq4-TIINxVgVRg/viewform?usp=publish-editor"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="p-3 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition"
+                    title="Help & Feedback"
+                >
+                    <i data-lucide="help-circle" class="w-6 h-6"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="text-gray-600 text-xs font-medium">Total Questions</div>
+                <div class="text-2xl font-bold text-indigo-600" id="stat-total">0</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="text-gray-600 text-xs font-medium">Solved</div>
+                <div class="text-2xl font-bold text-green-600" id="stat-solved">0</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="text-gray-600 text-xs font-medium">Attempted</div>
+                <div class="text-2xl font-bold text-yellow-600" id="stat-attempted">0</div>
+            </div>
+        </div>
+
+        <!-- Filters Section - May be used later -->
+        <!--
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Filters</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Difficulty</label>
+                    <select
+                        id="filter-difficulty"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                        onchange="applyFilters()"
+                    >
+                        <option value="">All</option>
+                        <option>Easy</option>
+                        <option>Medium</option>
+                        <option>Hard</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select
+                        id="filter-status"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                        onchange="applyFilters()"
+                    >
+                        <option value="">All</option>
+                        <option>Not Attempted</option>
+                        <option>Attempted</option>
+                        <option>Solved</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Topic</label>
+                    <input
+                        type="text"
+                        id="filter-topic"
+                        placeholder="Search by topic..."
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        oninput="applyFilters()"
+                    />
+                </div>
+            </div>
+            <button
+                onclick="clearFilters()"
+                class="mt-4 text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+            >
+                Clear All Filters
+            </button>
+        </div>
+        -->
+
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Questions</h2>
+                <div class="flex gap-2">
+                    <div class="relative inline-block">
+                        <button
+                            id="status-filter-btn"
+                            onclick="toggleStatusFilter()"
+                            class="flex items-center gap-2 bg-gray-100 text-gray-700 p-2 rounded-lg hover:bg-gray-200 transition hidden"
+                            title="Filter by Status"
+                        >
+                            <i data-lucide="filter" class="w-5 h-5"></i>
+                        </button>
+                        <div id="status-filter-dropdown" class="hidden absolute left-0 top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-20 min-w-48 p-3">
+                            <div class="text-sm font-semibold text-gray-700 mb-3 flex justify-between items-center">
+                                <span>Filter by Status</span>
+                                <button onclick="event.stopPropagation(); clearStatusFilter()" class="text-xs text-indigo-600 hover:text-indigo-700">Reset</button>
+                            </div>
+                            <label class="flex items-center gap-2 px-2 py-2 hover:bg-gray-50 rounded cursor-pointer">
+                                <input type="checkbox" id="filter-not-attempted" checked onchange="applyStatusFilter()" class="w-4 h-4 text-indigo-600 rounded">
+                                <i data-lucide="circle" class="w-4 h-4 text-gray-400"></i>
+                                <span class="text-sm">Not Attempted</span>
+                            </label>
+                            <label class="flex items-center gap-2 px-2 py-2 hover:bg-gray-50 rounded cursor-pointer">
+                                <input type="checkbox" id="filter-attempted" checked onchange="applyStatusFilter()" class="w-4 h-4 text-indigo-600 rounded">
+                                <i data-lucide="circle-dot" class="w-4 h-4 text-yellow-600"></i>
+                                <span class="text-sm">Attempted</span>
+                            </label>
+                            <label class="flex items-center gap-2 px-2 py-2 hover:bg-gray-50 rounded cursor-pointer">
+                                <input type="checkbox" id="filter-solved" checked onchange="applyStatusFilter()" class="w-4 h-4 text-indigo-600 rounded">
+                                <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+                                <span class="text-sm">Solved</span>
+                            </label>
+                        </div>
+                    </div>
+                    <button
+                        id="sort-difficulty-btn"
+                        onclick="toggleDifficultySort()"
+                        class="flex items-center gap-2 bg-gray-100 text-gray-700 p-2 rounded-lg hover:bg-gray-200 transition hidden"
+                        title="Sort by Difficulty: Easy to Hard"
+                    >
+                        <i data-lucide="signal" class="w-5 h-5" id="sort-difficulty-icon"></i>
+                    </button>
+                    <button
+                        id="sort-btn"
+                        onclick="toggleSort()"
+                        class="flex items-center gap-2 bg-gray-100 text-gray-700 p-2 rounded-lg hover:bg-gray-200 transition hidden"
+                        title="Sort: Oldest First"
+                    >
+                        <i data-lucide="arrow-down-a-z" class="w-5 h-5" id="sort-icon"></i>
+                    </button>
+                    <button
+                        id="clear-data-btn"
+                        class="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition hidden"
+                        title="Clear all data"
+                    >
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        <span>Clear All</span>
+                    </button>
+                    <button
+                        id="toggle-form-btn"
+                        class="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+                    >
+                        <i data-lucide="plus" class="w-5 h-5"></i>
+                        <span>Add Question</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="add-form" class="bg-gray-50 p-6 rounded-lg mb-6 border-2 border-indigo-200 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Question Title</label>
+                        <input
+                            type="text"
+                            id="input-title"
+                            required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            placeholder="e.g., Two Sum"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Topic</label>
+                        <input
+                            type="text"
+                            id="input-topic"
+                            required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            placeholder="e.g., Array, Tree, Graph"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Difficulty</label>
+                        <select
+                            id="input-difficulty"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                        >
+                            <option>Easy</option>
+                            <option>Medium</option>
+                            <option>Hard</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                        <select
+                            id="input-status"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                        >
+                            <option>Not Attempted</option>
+                            <option>Attempted</option>
+                            <option>Solved</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Problem URL (optional)
+                    </label>
+                    <input
+                        type="text"
+                        id="input-url"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        placeholder="https://example.com/problem/..."
+                    />
+                    <div id="url-validation" class="mt-1 text-sm hidden"></div>
+                </div>
+                <div class="mb-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Hints (optional)
+                        </label>
+                        <span class="text-xs text-gray-500" id="input-hints-counter">0/4 hints</span>
+                    </div>
+                    <div id="hints-container" class="space-y-3">
+                        <!-- Hint fields will be added here -->
+                    </div>
+                    <button
+                        type="button"
+                        id="add-hint-btn"
+                        onclick="addHintField()"
+                        class="mt-3 flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm"
+                    >
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>Add Hint</span>
+                    </button>
+                </div>
+                <button
+                    id="add-question-btn"
+                    class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition font-medium"
+                >
+                    Add Question
+                </button>
+            </div>
+
+            <div id="questions-list" class="space-y-3"></div>
+            
+            <div id="empty-state" class="text-center py-12 text-gray-500 hidden">
+                <span>No questions added yet. </span>
+                <button 
+                    onclick="document.getElementById('toggle-form-btn').click()" 
+                    class="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline"
+                >
+                    Click Add Question to get started!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hint Dialog Modal -->
+    <div id="hint-dialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50" onclick="closeHintDialog()">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-5/6 overflow-hidden flex flex-col" onclick="event.stopPropagation()">
+            <!-- Header -->
+            <div class="flex justify-between items-center p-6 border-b bg-yellow-50">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-yellow-200 rounded-full">
+                        <i data-lucide="lightbulb" class="w-6 h-6 text-yellow-700"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Hints</h2>
+                        <p class="text-sm text-gray-600" id="hint-dialog-question-title"></p>
+                    </div>
+                </div>
+                <button
+                    onclick="closeHintDialog()"
+                    class="p-2 hover:bg-yellow-100 rounded-lg transition"
+                    title="Close"
+                >
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="flex-1 overflow-auto p-6">
+                <div id="hints-content">
+                    <!-- Hints will be populated here -->
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="border-t p-6 flex justify-end">
+                <button
+                    onclick="closeHintDialog()"
+                    class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                >
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coding Dialog Modal -->
+    <div id="coding-dialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50" onclick="closeCodingDialog()">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-6xl h-5/6 flex flex-col" onclick="event.stopPropagation()">
+            <!-- Header -->
+            <div class="flex justify-between items-center p-6 border-b">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800" id="dialog-question-title"></h2>
+                    <div class="flex items-center gap-3 mt-2">
+                        <span class="text-sm text-gray-600" id="dialog-question-topic">Topic</span>
+                        <span class="px-2 py-1 rounded text-xs font-medium" id="dialog-question-difficulty">Easy</span>
+                    </div>
+                </div>
+                <button
+                    onclick="closeCodingDialog()"
+                    class="p-2 hover:bg-gray-100 rounded-lg transition"
+                    title="Close"
+                >
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="flex-1 overflow-auto p-6">
+                <div class="text-center text-gray-500 py-20">
+                    <i data-lucide="code-2" class="w-16 h-16 mx-auto mb-4 text-gray-400"></i>
+                    <h3 class="text-xl font-semibold mb-2">Coding Interface</h3>
+                    <p>This section will be updated with coding features later</p>
+                    <p class="text-sm mt-2">Question ID: <span id="dialog-question-id" class="font-mono">-</span></p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="border-t p-6 flex justify-end gap-3">
+                <button
+                    onclick="closeCodingDialog()"
+                    class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                >
+                    Close
+                </button>
+                <button
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                >
+                    Save Progress
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // EDIT MODE STATE
+        // ========================================
+        let editMode = false;
+        let editingQuestionId = null;
+        let filteredQuestions = [];
+        let sortOrder = 'asc'; // 'asc' for oldest first, 'desc' for newest first
+        let difficultySortOrder = 'asc'; // 'asc' for easy to hard, 'desc' for hard to easy
+        let activeSortType = 'date'; // 'date' or 'difficulty'
+        let statusFilter = {
+            'Not Attempted': true,
+            'Attempted': true,
+            'Solved': true
+        };
+
+        // ========================================
+        // HINT FIELD MANAGEMENT
+        // ========================================
+        let hintCounter = 0;
+        const defaultHintLabels = ['Direction', 'Key Insight', 'Edge Case', 'Pattern/Optimization'];
+
+        const addHintField = (label = '', content = '', containerId = 'hints-container') => {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            const currentHints = container.querySelectorAll('.hint-field').length;
+            if (currentHints >= 4) {
+                alert('Maximum 4 hints allowed');
+                return;
+            }
+            
+            const hintIndex = hintCounter++;
+            const defaultLabel = defaultHintLabels[currentHints] || `Hint ${currentHints + 1}`;
+            
+            const hintField = document.createElement('div');
+            hintField.className = 'hint-field bg-gray-50 border-2 border-gray-200 rounded-lg p-4';
+            hintField.setAttribute('data-hint-index', hintIndex);
+            
+            hintField.innerHTML = `
+                <div class="flex gap-3">
+                    <div class="flex-shrink-0 w-40">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Label</label>
+                        <input
+                            type="text"
+                            class="hint-label w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            placeholder="e.g., Direction"
+                            value="${label || defaultLabel}"
+                        />
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Hint Content</label>
+                        <input
+                            type="text"
+                            class="hint-content w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            placeholder="Enter hint text..."
+                            value="${content}"
+                        />
+                    </div>
+                    <div class="flex-shrink-0 flex items-end">
+                        <button
+                            type="button"
+                            onclick="removeHintField(${hintIndex}, '${containerId}')"
+                            class="p-2 text-red-600 hover:bg-red-50 rounded transition"
+                            title="Remove hint"
+                        >
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(hintField);
+            lucide.createIcons();
+            updateHintCounter(containerId);
+        };
+
+        const removeHintField = (hintIndex, containerId = 'hints-container') => {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            const hintField = container.querySelector(`[data-hint-index="${hintIndex}"]`);
+            if (hintField) {
+                hintField.remove();
+                updateHintCounter(containerId);
+            }
+        };
+
+        const updateHintCounter = (containerId = 'hints-container') => {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            const count = container.querySelectorAll('.hint-field').length;
+            const counterElement = document.getElementById(`${containerId === 'hints-container' ? 'input' : 'edit'}-hints-counter`);
+            const addButton = document.getElementById(containerId === 'hints-container' ? 'add-hint-btn' : `add-hint-btn-edit`);
+            
+            if (counterElement) {
+                counterElement.textContent = `${count}/4 hints`;
+                if (count >= 4) {
+                    counterElement.className = 'text-xs text-yellow-600 font-semibold';
+                } else {
+                    counterElement.className = 'text-xs text-gray-500';
+                }
+            }
+            
+            if (addButton) {
+                if (count >= 4) {
+                    addButton.disabled = true;
+                    addButton.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    addButton.disabled = false;
+                    addButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            }
+        };
+
+        const getHintsFromFields = (containerId = 'hints-container') => {
+            const container = document.getElementById(containerId);
+            if (!container) return [];
+            
+            const hintFields = container.querySelectorAll('.hint-field');
+            const hints = [];
+            
+            hintFields.forEach(field => {
+                const label = field.querySelector('.hint-label').value.trim();
+                const content = field.querySelector('.hint-content').value.trim();
+                if (content) {  // Only add if content exists
+                    hints.push({ label: label || 'Hint', content });
+                }
+            });
+            
+            return hints;
+        };
+
+        const clearHintFields = (containerId = 'hints-container') => {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            updateHintCounter(containerId);
+        };
+
+        // ========================================
+        // STATUS FILTER FUNCTIONS
+        // ========================================
+        const toggleStatusFilter = () => {
+            const dropdown = document.getElementById('status-filter-dropdown');
+            dropdown.classList.toggle('hidden');
+            
+            // Re-render icons
+            setTimeout(() => lucide.createIcons(), 10);
+        };
+
+        const applyStatusFilter = () => {
+            statusFilter['Not Attempted'] = document.getElementById('filter-not-attempted').checked;
+            statusFilter['Attempted'] = document.getElementById('filter-attempted').checked;
+            statusFilter['Solved'] = document.getElementById('filter-solved').checked;
+            
+            updateStatusFilterButton();
+            applyFilters();
+        };
+
+        const clearStatusFilter = () => {
+            document.getElementById('filter-not-attempted').checked = true;
+            document.getElementById('filter-attempted').checked = true;
+            document.getElementById('filter-solved').checked = true;
+            applyStatusFilter();
+        };
+
+        const updateStatusFilterButton = () => {
+            const filterBtn = document.getElementById('status-filter-btn');
+            const allSelected = statusFilter['Not Attempted'] && statusFilter['Attempted'] && statusFilter['Solved'];
+            
+            if (allSelected) {
+                filterBtn.classList.remove('bg-indigo-100', 'text-indigo-700');
+                filterBtn.classList.add('bg-gray-100', 'text-gray-700');
+            } else {
+                filterBtn.classList.add('bg-indigo-100', 'text-indigo-700');
+                filterBtn.classList.remove('bg-gray-100', 'text-gray-700');
+            }
+        };
+
+        // ========================================
+        // SORTING FUNCTIONS
+        // ========================================
+        const toggleSort = () => {
+            activeSortType = 'date';
+            sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+            updateSortButton();
+            updateDifficultySortButton();
+            applyFilters(); // Re-render with new sort order
+        };
+
+        const toggleDifficultySort = () => {
+            activeSortType = 'difficulty';
+            difficultySortOrder = difficultySortOrder === 'asc' ? 'desc' : 'asc';
+            updateDifficultySortButton();
+            updateSortButton();
+            applyFilters(); // Re-render with new sort order
+        };
+
+        const updateSortButton = () => {
+            const sortIcon = document.getElementById('sort-icon');
+            const sortBtn = document.getElementById('sort-btn');
+            
+            if (activeSortType === 'date') {
+                sortBtn.classList.add('bg-indigo-100', 'text-indigo-700');
+                sortBtn.classList.remove('bg-gray-100', 'text-gray-700');
+            } else {
+                sortBtn.classList.remove('bg-indigo-100', 'text-indigo-700');
+                sortBtn.classList.add('bg-gray-100', 'text-gray-700');
+            }
+            
+            if (sortOrder === 'asc') {
+                sortIcon.setAttribute('data-lucide', 'arrow-down-a-z');
+                sortBtn.setAttribute('title', 'Sort by Date: Oldest First (click to show newest first)');
+            } else {
+                sortIcon.setAttribute('data-lucide', 'arrow-up-z-a');
+                sortBtn.setAttribute('title', 'Sort by Date: Newest First (click to show oldest first)');
+            }
+            lucide.createIcons();
+        };
+
+        const updateDifficultySortButton = () => {
+            const sortIcon = document.getElementById('sort-difficulty-icon');
+            const sortBtn = document.getElementById('sort-difficulty-btn');
+            
+            if (activeSortType === 'difficulty') {
+                sortBtn.classList.add('bg-indigo-100', 'text-indigo-700');
+                sortBtn.classList.remove('bg-gray-100', 'text-gray-700');
+            } else {
+                sortBtn.classList.remove('bg-indigo-100', 'text-indigo-700');
+                sortBtn.classList.add('bg-gray-100', 'text-gray-700');
+            }
+            
+            if (difficultySortOrder === 'asc') {
+                sortIcon.setAttribute('data-lucide', 'signal');
+                sortBtn.setAttribute('title', 'Sort by Difficulty: Easy to Hard (click to reverse)');
+            } else {
+                sortIcon.setAttribute('data-lucide', 'signal');
+                sortBtn.setAttribute('title', 'Sort by Difficulty: Hard to Easy (click to reverse)');
+            }
+            lucide.createIcons();
+        };
+
+        const sortQuestions = (questionsArray) => {
+            return [...questionsArray].sort((a, b) => {
+                if (activeSortType === 'difficulty') {
+                    // Define difficulty order
+                    const difficultyOrder = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
+                    const diffA = difficultyOrder[a.difficulty] || 0;
+                    const diffB = difficultyOrder[b.difficulty] || 0;
+                    
+                    if (difficultySortOrder === 'asc') {
+                        return diffA - diffB; // Easy to Hard
+                    } else {
+                        return diffB - diffA; // Hard to Easy
+                    }
+                } else {
+                    // Sort by date
+                    const dateA = new Date(a.timestamp || 0);
+                    const dateB = new Date(b.timestamp || 0);
+                    
+                    if (sortOrder === 'asc') {
+                        return dateA - dateB; // Oldest first
+                    } else {
+                        return dateB - dateA; // Newest first
+                    }
+                }
+            });
+        };
+
+        // ========================================
+        // FILTER FUNCTIONS
+        // ========================================
+        const applyFilters = () => {
+            // Apply status filter
+            let filtered = questions.filter(q => {
+                return statusFilter[q.status];
+            });
+
+            // Apply sorting
+            filteredQuestions = sortQuestions(filtered);
+
+            renderQuestions();
+        };
+
+        const clearFilters = () => {
+            clearStatusFilter();
+        };
+
+        // ========================================
+        // DATA SERVICE LAYER (Connected to Spring Boot API)
+        // ========================================
+        const API_BASE_URL = 'http://localhost:8080/api/questions';
+
+        // Helper functions to map frontend text to Spring Boot Enums
+        const formatForBackend = (q) => ({
+            ...q,
+            difficulty: q.difficulty ? q.difficulty.toUpperCase() : undefined,
+            status: q.status ? q.status.toUpperCase().replace(' ', '_') : undefined
+        });
+
+        const formatForFrontend = (q) => ({
+            ...q,
+            difficulty: q.difficulty ? q.difficulty.charAt(0) + q.difficulty.slice(1).toLowerCase() : undefined,
+            status: q.status ? q.status.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ') : undefined
+        });
+
+        const DataService = {
+            // Load questions from Spring Boot
+            async loadQuestions() {
+                try {
+                    const response = await fetch(API_BASE_URL);
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const data = await response.json();
+                    return data.map(formatForFrontend); // Map Enums back to readable text
+                } catch (error) {
+                    console.error('Error loading questions from backend:', error);
+                    return [];
+                }
+            },
+            
+           // Add a new question
+            async addQuestion(question) {
+                try {
+                    const backendData = formatForBackend(question);
+                    delete backendData.id; // <--- THE MAGIC FIX: Strip the fake JS ID so Spring Boot can generate a real one!
+
+                    const response = await fetch(API_BASE_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(backendData)
+                    });
+                    if (!response.ok) throw new Error('Failed to save to backend');
+                    return { success: true };
+                } catch (error) {
+                    console.error('Error saving question:', error);
+                    alert("Backend is not running! Make sure your Spring Boot server is started.");
+                    return { success: false, error };
+                }
+            },
+            
+            // Update a question completely
+            async updateQuestion(id, updates) {
+                try {
+                    // Fetch the existing question first to merge the updates
+                    const currentQuestion = questions.find(q => q.id === id);
+                    const mergedQuestion = { ...currentQuestion, ...updates };
+                    
+                    const response = await fetch(`${API_BASE_URL}/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formatForBackend(mergedQuestion))
+                    });
+                    if (!response.ok) throw new Error('Failed to update');
+                    return { success: true };
+                } catch (error) {
+                    console.error('Error updating question:', error);
+                    return { success: false, error };
+                }
+            },
+            
+            // Delete a question
+            async deleteQuestion(id) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/${id}`, {
+                        method: 'DELETE'
+                    });
+                    if (!response.ok) throw new Error('Failed to delete');
+                    return { success: true };
+                } catch (error) {
+                    console.error('Error deleting question:', error);
+                    return { success: false, error };
+                }
+            },
+
+            // Clear all data
+            async clearAllData() {
+                alert("Clear All feature needs a custom backend endpoint. Skipping for now!");
+                return { success: false };
+            }
+        };
+        // ========================================
+        // UI LOGIC
+        // ========================================
+        
+        let questions = [];
+
+        const getDifficultyColor = (difficulty) => {
+            switch(difficulty) {
+                case 'Easy': return 'bg-green-500 text-white';
+                case 'Medium': return 'bg-yellow-500 text-white';
+                case 'Hard': return 'bg-red-500 text-white';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        };
+
+        const getStatusColor = (status) => {
+            switch(status) {
+                case 'Solved': return 'bg-green-50 border-green-200';
+                case 'Attempted': return 'bg-yellow-50 border-yellow-200';
+                case 'Not Attempted': return 'bg-gray-50 border-gray-200';
+                default: return 'bg-white border-gray-200';
+            }
+        };
+
+        const getStatusIcon = (status) => {
+            switch(status) {
+                case 'Solved': return 'check-circle';
+                case 'Attempted': return 'circle-dot';
+                case 'Not Attempted': return 'circle';
+                default: return 'circle';
+            }
+        };
+
+        const getStatusIconColor = (status) => {
+            switch(status) {
+                case 'Solved': return 'text-green-600';
+                case 'Attempted': return 'text-yellow-600';
+                case 'Not Attempted': return 'text-gray-400';
+                default: return 'text-gray-400';
+            }
+        };
+
+        const formatDate = (timestamp) => {
+            if (!timestamp) return 'No date';
+            const date = new Date(timestamp);
+            const day = String(date.getDate()).padStart(2, '0');
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+            const month = months[date.getMonth()];
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        };
+
+        const updateStats = () => {
+            const total = questions.length;
+            const solved = questions.filter(q => q.status === 'Solved').length;
+            const attempted = questions.filter(q => q.status === 'Attempted').length;
+
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-solved').textContent = solved;
+            document.getElementById('stat-attempted').textContent = attempted;
+        };
+
+        const renderQuestions = () => {
+            const container = document.getElementById('questions-list');
+            const emptyState = document.getElementById('empty-state');
+            const form = document.getElementById('add-form');
+            const formIsVisible = !form.classList.contains('hidden');
+            const clearBtn = document.getElementById('clear-data-btn');
+            const sortBtn = document.getElementById('sort-btn');
+            const sortDifficultyBtn = document.getElementById('sort-difficulty-btn');
+            const statusFilterBtn = document.getElementById('status-filter-btn');
+
+            // Show/hide buttons based on whether questions exist
+            if (questions.length > 0) {
+                clearBtn.classList.remove('hidden');
+                sortBtn.classList.remove('hidden');
+                sortDifficultyBtn.classList.remove('hidden');
+                statusFilterBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+                sortBtn.classList.add('hidden');
+                sortDifficultyBtn.classList.add('hidden');
+                statusFilterBtn.classList.add('hidden');
+            }
+
+            // Use filtered questions for display
+            const questionsToDisplay = filteredQuestions;
+
+            if (questionsToDisplay.length === 0) {
+                container.innerHTML = '';
+                // Only show empty state if form is not visible
+                if (formIsVisible) {
+                    emptyState.classList.add('hidden');
+                } else {
+                    // Check if we're filtering or truly empty
+                    const isFiltering = !(statusFilter['Not Attempted'] && statusFilter['Attempted'] && statusFilter['Solved']);
+                    
+                    if (isFiltering && questions.length > 0) {
+                        emptyState.innerHTML = '<div class="text-center py-12 text-gray-500">No questions match your filter. <button onclick="clearStatusFilter()" class="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline">Clear filter</button> to see all questions.</div>';
+                        emptyState.classList.remove('hidden');
+                    } else if (questions.length === 0) {
+                        emptyState.innerHTML = '<span>No questions added yet. </span><button onclick="document.getElementById(\'toggle-form-btn\').click()" class="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline">Click Add Question to get started!</button>';
+                        emptyState.classList.remove('hidden');
+                    }
+                }
+                updateStats();
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            container.innerHTML = questionsToDisplay.map(question => {
+                // Check if this question is being edited
+                if (editingQuestionId === question.id) {
+                    return `
+                        <div class="bg-blue-50 p-6 rounded-lg border-2 border-indigo-400">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Question Title</label>
+                                    <input
+                                        type="text"
+                                        id="edit-title-${question.id}"
+                                        value="${question.title}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Topic</label>
+                                    <input
+                                        type="text"
+                                        id="edit-topic-${question.id}"
+                                        value="${question.topic}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Difficulty</label>
+                                    <select
+                                        id="edit-difficulty-${question.id}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                                    >
+                                        <option ${question.difficulty === 'Easy' ? 'selected' : ''}>Easy</option>
+                                        <option ${question.difficulty === 'Medium' ? 'selected' : ''}>Medium</option>
+                                        <option ${question.difficulty === 'Hard' ? 'selected' : ''}>Hard</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                                    <select
+                                        id="edit-status-${question.id}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                                    >
+                                        <option ${question.status === 'Not Attempted' ? 'selected' : ''}>Not Attempted</option>
+                                        <option ${question.status === 'Attempted' ? 'selected' : ''}>Attempted</option>
+                                        <option ${question.status === 'Solved' ? 'selected' : ''}>Solved</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Problem URL (optional)</label>
+                                <input
+                                    type="text"
+                                    id="edit-url-${question.id}"
+                                    value="${question.url || ''}"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                />
+                            </div>
+                            <div class="mb-4">
+                                <div class="flex justify-between items-center mb-3">
+                                    <label class="block text-sm font-medium text-gray-700">Hints (optional)</label>
+                                    <span class="text-xs text-gray-500" id="edit-hints-counter">0/4 hints</span>
+                                </div>
+                                <div id="edit-hints-container" class="space-y-3">
+                                    <!-- Hint fields will be added here -->
+                                </div>
+                                <button
+                                    type="button"
+                                    id="add-hint-btn-edit"
+                                    onclick="addHintField('', '', 'edit-hints-container')"
+                                    class="mt-3 flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm"
+                                >
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    <span>Add Hint</span>
+                                </button>
+                            </div>
+                            <div class="flex gap-2">
+                                <button
+                                    onclick="saveEdit(${question.id})"
+                                    class="flex-1 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition font-medium"
+                                >
+                                    Update Question
+                                </button>
+                                <button
+                                    onclick="cancelEdit()"
+                                    class="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition font-medium"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Normal question card
+                return `
+                    <div class="border-2 rounded-lg p-4 transition ${getStatusColor(question.status)} ${question.url ? 'cursor-pointer hover:shadow-lg hover:border-indigo-300' : ''}" 
+                         onclick="${question.url ? `openQuestionUrl('${question.url}', event)` : ''}"
+                         title="${question.url ? 'Click to open problem' : ''}">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h3 class="text-lg font-semibold text-gray-800">
+                                        ${question.url ? 
+                                            `<a href="${question.url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="hover:text-indigo-600 inline-flex items-center gap-1">
+                                                ${question.title}
+                                                <i data-lucide="external-link" class="w-4 h-4"></i>
+                                            </a>` : 
+                                            question.title
+                                        }
+                                    </h3>
+                                    <span class="px-2 py-1 rounded text-xs font-medium ${getDifficultyColor(question.difficulty)}">
+                                        ${question.difficulty}
+                                    </span>
+                                    <button
+                                        onclick="event.stopPropagation(); openHintDialog(${question.id})"
+                                        class="p-1.5 bg-yellow-400 text-yellow-900 rounded-full hover:bg-yellow-500 transition shadow-sm"
+                                        title="View hints"
+                                    >
+                                        <i data-lucide="lightbulb" class="w-4 h-4"></i>
+                                    </button>
+                                    <button
+                                        onclick="event.stopPropagation(); openCodingDialog(${question.id})"
+                                        class="px-3 py-1 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-xs font-semibold rounded-full hover:from-purple-600 hover:to-indigo-600 transition shadow-sm"
+                                        title="Practice coding"
+                                    >
+                                        Revise
+                                    </button>
+                                </div>
+                                <div class="flex items-center gap-4 text-sm text-gray-600">
+                                    <span class="font-medium">Topic: ${question.topic}</span>
+                                    <span class="text-gray-500">Added: ${formatDate(question.timestamp)}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 ml-4">
+                                <div class="relative inline-block">
+                                    <button
+                                        onclick="event.stopPropagation(); toggleStatusDropdown(${question.id})"
+                                        class="p-2 hover:bg-gray-100 rounded transition ${getStatusIconColor(question.status)}"
+                                        title="Change status: ${question.status}"
+                                    >
+                                        <i data-lucide="${getStatusIcon(question.status)}" class="w-5 h-5"></i>
+                                    </button>
+                                    <div id="status-dropdown-${question.id}" class="hidden absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-40">
+                                        <button onclick="event.stopPropagation(); updateStatusFromDropdown(${question.id}, 'Not Attempted')" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-sm rounded-t-lg">
+                                            <i data-lucide="circle" class="w-4 h-4 text-gray-400"></i>
+                                            Not Attempted
+                                        </button>
+                                        <button onclick="event.stopPropagation(); updateStatusFromDropdown(${question.id}, 'Attempted')" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-sm">
+                                            <i data-lucide="circle-dot" class="w-4 h-4 text-yellow-600"></i>
+                                            Attempted
+                                        </button>
+                                        <button onclick="event.stopPropagation(); updateStatusFromDropdown(${question.id}, 'Solved')" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-sm rounded-b-lg">
+                                            <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+                                            Solved
+                                        </button>
+                                    </div>
+                                </div>
+                                <button
+                                    onclick="event.stopPropagation(); editQuestion(${question.id})"
+                                    class="p-2 text-blue-600 hover:bg-blue-50 rounded transition"
+                                    title="Edit"
+                                >
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                </button>
+                                <button
+                                    onclick="event.stopPropagation(); deleteQuestion(${question.id})"
+                                    class="p-2 text-red-600 hover:bg-red-50 rounded transition"
+                                    title="Delete"
+                                >
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+            updateStats();
+        };
+
+        const addQuestion = async () => {
+            const title = document.getElementById('input-title').value.trim();
+            const topic = document.getElementById('input-topic').value.trim();
+            const difficulty = document.getElementById('input-difficulty').value;
+            const status = document.getElementById('input-status').value;
+            const url = document.getElementById('input-url').value.trim();
+            const hintsData = getHintsFromFields('hints-container');
+
+            // Validate required fields
+            if (!title && !topic) {
+                alert('Please fill in the required fields: Title and Topic');
+                return;
+            }
+            if (!title) {
+                alert('Please fill in the Question Title');
+                return;
+            }
+            if (!topic) {
+                alert('Please fill in the Topic');
+                return;
+            }
+
+            // Validate URL format if provided
+            if (url && !url.match(/^https?:\/\/.+/i)) {
+                alert('Please enter a valid URL (e.g., https://example.com/problem)');
+                return;
+            }
+
+            // Check for duplicate URL
+            if (url) {
+                const existingQuestion = questions.find(q => 
+                    q.url && 
+                    q.url.toLowerCase() === url.toLowerCase()
+                );
+                if (existingQuestion) {
+                    alert(`This question already exists: "${existingQuestion.title}"`);
+                    return;
+                }
+            }
+
+         // Add new question with timestamp (ID is handled by Backend)
+            const newQuestion = {
+                title,
+                difficulty,
+                topic,
+                status,
+                url,
+                hints: hintsData,
+                timestamp: new Date().toISOString()
+            };
+            await DataService.addQuestion(newQuestion);
+
+            await loadData();
+            
+            // Reset form
+            resetForm();
+            toggleForm();
+        };
+
+        const editQuestion = (id) => {
+            editingQuestionId = id;
+            renderQuestions();
+            
+            // Populate hints after a short delay to ensure DOM is ready
+            setTimeout(() => {
+                const question = questions.find(q => q.id === id);
+                if (question && question.hints) {
+                    clearHintFields('edit-hints-container');
+                    
+                    // Handle both old format (array of strings) and new format (array of objects)
+                    if (Array.isArray(question.hints)) {
+                        question.hints.forEach((hint, index) => {
+                            if (typeof hint === 'string') {
+                                // Old format: just string
+                                addHintField(defaultHintLabels[index] || `Hint ${index + 1}`, hint, 'edit-hints-container');
+                            } else if (hint.label && hint.content) {
+                                // New format: {label, content}
+                                addHintField(hint.label, hint.content, 'edit-hints-container');
+                            }
+                        });
+                    }
+                }
+                lucide.createIcons();
+            }, 100);
+        };
+
+        const saveEdit = async (id) => {
+            const title = document.getElementById(`edit-title-${id}`).value.trim();
+            const topic = document.getElementById(`edit-topic-${id}`).value.trim();
+            const difficulty = document.getElementById(`edit-difficulty-${id}`).value;
+            const status = document.getElementById(`edit-status-${id}`).value;
+            const url = document.getElementById(`edit-url-${id}`).value.trim();
+            const hintsData = getHintsFromFields('edit-hints-container');
+
+            // Validate required fields
+            if (!title || !topic) {
+                alert('Title and Topic are required');
+                return;
+            }
+
+            // Validate URL format if provided
+            if (url && !url.match(/^https?:\/\/.+/i)) {
+                alert('Please enter a valid URL');
+                return;
+            }
+
+            // Check for duplicate URL (excluding current question)
+            if (url) {
+                const existingQuestion = questions.find(q => 
+                    q.url && 
+                    q.url.toLowerCase() === url.toLowerCase() && 
+                    q.id !== id
+                );
+                if (existingQuestion) {
+                    alert(`This URL is already used by: "${existingQuestion.title}"`);
+                    return;
+                }
+            }
+
+            const originalQuestion = questions.find(q => q.id === id);
+            await DataService.updateQuestion(id, {
+                title,
+                difficulty,
+                topic,
+                status,
+                url,
+                hints: hintsData,
+                timestamp: originalQuestion.timestamp || new Date().toISOString()
+            });
+
+            editingQuestionId = null;
+            await loadData();
+        };
+
+        const cancelEdit = () => {
+            editingQuestionId = null;
+            renderQuestions();
+        };
+
+        const deleteQuestion = async (id) => {
+            if (confirm('Are you sure you want to delete this question?')) {
+                await DataService.deleteQuestion(id);
+                await loadData();
+            }
+        };
+
+        const updateStatus = async (id, newStatus) => {
+            await DataService.updateQuestion(id, { status: newStatus });
+            await loadData();
+        };
+
+        const toggleStatusDropdown = (id) => {
+            // Close all other dropdowns first
+            document.querySelectorAll('[id^="status-dropdown-"]').forEach(dropdown => {
+                if (dropdown.id !== `status-dropdown-${id}`) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+            
+            // Toggle current dropdown
+            const dropdown = document.getElementById(`status-dropdown-${id}`);
+            dropdown.classList.toggle('hidden');
+            
+            // Re-render icons
+            setTimeout(() => lucide.createIcons(), 10);
+        };
+
+        const updateStatusFromDropdown = async (id, newStatus) => {
+            // Close dropdown
+            const dropdown = document.getElementById(`status-dropdown-${id}`);
+            dropdown.classList.add('hidden');
+            
+            // Update status
+            await DataService.updateQuestion(id, { status: newStatus });
+            await loadData();
+        };
+
+        const openQuestionUrl = (url, event) => {
+            // Don't open if clicking on interactive elements
+            if (event.target.tagName === 'SELECT' || 
+                event.target.tagName === 'BUTTON' || 
+                event.target.tagName === 'A' ||
+                event.target.closest('button') ||
+                event.target.closest('select')) {
+                return;
+            }
+            window.open(url, '_blank');
+        };
+
+        const openCodingDialog = (id) => {
+            const question = questions.find(q => q.id === id);
+            if (!question) return;
+
+            // Populate dialog with question data
+            const titleElement = document.getElementById('dialog-question-title');
+            if (question.url) {
+                titleElement.innerHTML = `
+                    <a href="${question.url}" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-600 inline-flex items-center gap-2">
+                        ${question.title}
+                        <i data-lucide="external-link" class="w-5 h-5"></i>
+                    </a>
+                `;
+            } else {
+                titleElement.textContent = question.title;
+            }
+            
+            document.getElementById('dialog-question-topic').textContent = `Topic: ${question.topic}`;
+            document.getElementById('dialog-question-difficulty').textContent = question.difficulty;
+            document.getElementById('dialog-question-difficulty').className = `px-2 py-1 rounded text-xs font-medium ${getDifficultyColor(question.difficulty)}`;
+            document.getElementById('dialog-question-id').textContent = question.id;
+
+            // Show dialog
+            document.getElementById('coding-dialog').classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            
+            // Re-render icons
+            setTimeout(() => lucide.createIcons(), 10);
+        };
+
+        const closeCodingDialog = () => {
+            document.getElementById('coding-dialog').classList.add('hidden');
+            document.body.style.overflow = ''; // Restore scrolling
+        };
+
+        const openHintDialog = (id) => {
+            const question = questions.find(q => q.id === id);
+            if (!question) return;
+
+            console.log('Opening hint dialog for question:', question);
+            console.log('Question hints:', question.hints);
+
+            // Populate dialog with question data
+            const titleElement = document.getElementById('hint-dialog-question-title');
+            if (question.url) {
+                titleElement.innerHTML = `
+                    <a href="${question.url}" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-600 inline-flex items-center gap-1">
+                        ${question.title}
+                        <i data-lucide="external-link" class="w-3 h-3"></i>
+                    </a>
+                `;
+            } else {
+                titleElement.textContent = question.title;
+            }
+            
+            // Populate hints content
+            const hintsContent = document.getElementById('hints-content');
+            const hints = question.hints || [];
+            
+            console.log('Rendering hints:', hints);
+            
+            if (hints.length === 0) {
+                hintsContent.innerHTML = `
+                    <div class="text-center text-gray-500 py-12">
+                        <i data-lucide="lightbulb" class="w-16 h-16 mx-auto mb-4 text-yellow-400"></i>
+                        <h3 class="text-xl font-semibold mb-2">No Hints Available</h3>
+                        <p class="text-sm">Hints for this question haven't been added yet.</p>
+                        <p class="text-sm mt-2">Edit the question to add hints.</p>
+                    </div>
+                `;
+            } else {
+                const hintIcons = ['navigation', 'key', 'alert-triangle', 'zap'];
+                
+                hintsContent.innerHTML = hints.map((hint, index) => {
+                    // Support both old format (string) and new format (object)
+                    let hintLabel, hintContent;
+                    if (typeof hint === 'string') {
+                        // Old format
+                        hintLabel = defaultHintLabels[index] || `Hint ${index + 1}`;
+                        hintContent = hint;
+                    } else if (hint.label && hint.content) {
+                        // New format
+                        hintLabel = hint.label;
+                        hintContent = hint.content;
+                    } else {
+                        return ''; // Skip invalid hints
+                    }
+                    
+                    return `
+                        <div class="mb-4" id="hint-${index}">
+                            <div class="flex items-start gap-3 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg">
+                                <div class="flex-shrink-0 p-2 bg-yellow-200 rounded-full">
+                                    <i data-lucide="${hintIcons[index] || 'lightbulb'}" class="w-5 h-5 text-yellow-700"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <h4 class="font-semibold text-gray-800">${hintLabel}</h4>
+                                    </div>
+                                    <p class="text-gray-700 hint-text ${index === 0 ? '' : 'hidden'}">${hintContent}</p>
+                                    ${index > 0 ? `
+                                        <button 
+                                            onclick="revealHint(${index})"
+                                            class="hint-reveal-btn mt-2 px-4 py-2 bg-yellow-400 text-yellow-900 rounded-lg hover:bg-yellow-500 transition text-sm font-medium"
+                                        >
+                                            Show ${hintLabel}
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Show dialog
+            document.getElementById('hint-dialog').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            // Re-render icons
+            setTimeout(() => lucide.createIcons(), 10);
+        };
+
+        const closeHintDialog = () => {
+            document.getElementById('hint-dialog').classList.add('hidden');
+            document.body.style.overflow = ''; // Restore scrolling
+        };
+
+        const revealHint = (index) => {
+            const hintElement = document.getElementById(`hint-${index}`);
+            const hintText = hintElement.querySelector('.hint-text');
+            const revealBtn = hintElement.querySelector('.hint-reveal-btn');
+            
+            hintText.classList.remove('hidden');
+            if (revealBtn) {
+                revealBtn.classList.add('hidden');
+            }
+        };
+
+        const clearAllData = async () => {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone!')) {
+                await DataService.clearAllData();
+                await loadData();
+            }
+        };
+
+        const resetForm = () => {
+            document.getElementById('input-title').value = '';
+            document.getElementById('input-topic').value = '';
+            document.getElementById('input-difficulty').value = 'Easy';
+            document.getElementById('input-status').value = 'Not Attempted';
+            document.getElementById('input-url').value = '';
+            document.getElementById('url-validation').classList.add('hidden');
+            
+            // Clear hint fields
+            clearHintFields('hints-container');
+        };
+
+        const toggleForm = () => {
+            const form = document.getElementById('add-form');
+            const btn = document.getElementById('toggle-form-btn');
+            const isHidden = form.classList.contains('hidden');
+
+            if (isHidden) {
+                form.classList.remove('hidden');
+                btn.innerHTML = '<i data-lucide="x" class="w-5 h-5"></i><span>Cancel</span>';
+                // Initialize with no hints initially
+                clearHintFields('hints-container');
+            } else {
+                form.classList.add('hidden');
+                btn.innerHTML = '<i data-lucide="plus" class="w-5 h-5"></i><span>Add Question</span>';
+                // Reset form when closing
+                resetForm();
+            }
+            lucide.createIcons();
+            
+            // Re-render to update empty state visibility
+            renderQuestions();
+        };
+
+       const loadData = async () => {
+            try {
+                // Fetch the real data from the Spring Boot API
+                questions = await DataService.loadQuestions();
+                
+                // If the backend returns nothing (or an error), ensure we have an empty array
+                if (!questions || !Array.isArray(questions)) {
+                    questions = [];
+                }
+                
+                applyFilters();
+            } catch (error) {
+                console.error("Critical error loading data:", error);
+                questions = [];
+                applyFilters();
+            }
+        };
+        // Event Listeners
+        document.getElementById('toggle-form-btn').addEventListener('click', toggleForm);
+        document.getElementById('add-question-btn').addEventListener('click', addQuestion);
+        document.getElementById('clear-data-btn').addEventListener('click', clearAllData);
+
+        // Allow Enter key to submit in form inputs (but not textarea)
+        ['input-title', 'input-topic', 'input-url'].forEach(id => {
+            document.getElementById(id).addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addQuestion();
+                }
+            });
+        });
+
+        // URL validation
+        let debounceTimer;
+        document.getElementById('input-url').addEventListener('input', async (e) => {
+            const url = e.target.value.trim();
+            const urlValidation = document.getElementById('url-validation');
+            
+            // Clear previous timer
+            clearTimeout(debounceTimer);
+            
+            // Reset validation message
+            if (!url) {
+                urlValidation.classList.add('hidden');
+                return;
+            }
+            
+            // Validate URL format
+            const isValidUrl = url.match(/^https?:\/\/.+/i);
+            
+            if (!isValidUrl) {
+                urlValidation.textContent = '⚠️ Invalid URL format';
+                urlValidation.className = 'mt-1 text-sm text-red-600';
+                urlValidation.classList.remove('hidden');
+                return;
+            }
+            
+            // Check for duplicate
+            const existingQuestion = questions.find(q => 
+                q.url && 
+                q.url.toLowerCase() === url.toLowerCase()
+            );
+            if (existingQuestion) {
+                urlValidation.textContent = `⚠️ This question already exists: "${existingQuestion.title}"`;
+                urlValidation.className = 'mt-1 text-sm text-orange-600';
+                urlValidation.classList.remove('hidden');
+                return;
+            }
+            
+            // URL is valid - hide validation message
+            urlValidation.classList.add('hidden');
+        });
+
+        // Initial load
+        loadData();
+        updateSortButton();
+        updateDifficultySortButton();
+        updateStatusFilterButton();
+        lucide.createIcons();
+
+        // Close dialog with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const codingDialog = document.getElementById('coding-dialog');
+                const hintDialog = document.getElementById('hint-dialog');
+                const statusFilterDropdown = document.getElementById('status-filter-dropdown');
+                
+                if (!codingDialog.classList.contains('hidden')) {
+                    closeCodingDialog();
+                } else if (!hintDialog.classList.contains('hidden')) {
+                    closeHintDialog();
+                } else if (!statusFilterDropdown.classList.contains('hidden')) {
+                    statusFilterDropdown.classList.add('hidden');
+                }
+                
+                // Close all status dropdowns
+                document.querySelectorAll('[id^="status-dropdown-"]').forEach(dropdown => {
+                    dropdown.classList.add('hidden');
+                });
+            }
+        });
+
+        // Close status dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            // Close question status dropdowns
+            if (!e.target.closest('[id^="status-dropdown-"]') && !e.target.closest('button[onclick*="toggleStatusDropdown"]')) {
+                document.querySelectorAll('[id^="status-dropdown-"]').forEach(dropdown => {
+                    dropdown.classList.add('hidden');
+                });
+            }
+            
+            // Close status filter dropdown
+            if (!e.target.closest('#status-filter-dropdown') && !e.target.closest('#status-filter-btn')) {
+                const filterDropdown = document.getElementById('status-filter-dropdown');
+                if (filterDropdown) {
+                    filterDropdown.classList.add('hidden');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

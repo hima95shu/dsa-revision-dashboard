@@ -36,11 +36,14 @@ public class QuestionService {
         questionRepository.deleteById(id);
     }
 
-    // 4. Update just the status of a question
+  // 4. Update just the status of a question
     public Question updateStatus(Long id, Status newStatus){
         Question question = questionRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Question not Found with id: "+ id));
 
+        // YOU WERE MISSING THESE TWO LINES:
+        question.setStatus(newStatus); // Actually update the status
+        return questionRepository.save(question); // Save it and return it
     }
 
     // 5. Calculate the statistics for your top dashboard cards
