@@ -75,5 +75,10 @@ public class QuestionController {
         questionService.deleteQuestion(id);
         return ResponseEntity.noContent().build();
     }
+    @DeleteMapping
+    public ResponseEntity<Void> deleteAllQuestions() {
+    questionService.deleteAllQuestions();
+    return ResponseEntity.noContent().build();
+}
 
 }

@@ -57,6 +57,10 @@ public class QuestionService {
         
         return stats;
     }
+    // 6. Delete all questions
+    public void deleteAllQuestions() {
+    questionRepository.deleteAll();
+    }
     
 
 }
